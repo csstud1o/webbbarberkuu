@@ -308,7 +308,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   // BUG FIX 2 & 3: Add event delegation for dynamically rendered buttons
   // Using event delegation on the content div for masters and services
-  document.getElementById('content').addEventListener('click', function(e) {
+  document.querySelector('.content').addEventListener('click', function(e) {
     // Handle toggle buttons (switch) - use closest to handle clicks on the ::after pseudo-element
     var switchEl = e.target.closest('.switch');
     if (switchEl) {
