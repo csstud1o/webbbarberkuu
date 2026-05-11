@@ -2274,6 +2274,33 @@ function aCloseModal(id) { document.getElementById(id).classList.remove('open');
 document.querySelectorAll('.a-modal-overlay').forEach(m => {
   m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
 });
+
+// BUG 1 FIX: Add Escape key handler to close modals
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' || e.keyCode === 27) {
+    // Close all open modals
+    document.querySelectorAll('.a-modal.open').forEach(m => m.classList.remove('open'));
+  }
+});
+
+// BUG 1 FIX: Add sidebar toggle function
+function aToggleSidebar() {
+  const sidebar = document.getElementById('a-sidebar');
+  if (sidebar) {
+    sidebar.classList.toggle('open');
+  }
+}
+
+// BUG 1 FIX: Click outside to close sidebar on mobile
+document.addEventListener('click', function(e) {
+  const sidebar = document.getElementById('a-sidebar');
+  const menuBtn = document.getElementById('a-menu-btn');
+  if (sidebar && sidebar.classList.contains('open')) {
+    if (!sidebar.contains(e.target) && (!menuBtn || !menuBtn.contains(e.target))) {
+      sidebar.classList.remove('open');
+    }
+  }
+});
 </script>
 </body>
 </html>

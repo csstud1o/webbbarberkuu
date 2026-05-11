@@ -292,6 +292,74 @@ let currentUser = null;
 document.addEventListener('DOMContentLoaded', async function() {
   console.log('Admin panel loading...');
 
+  // BUG FIX 1: Add Escape key handler to close modal
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' || e.keyCode === 27) {
+      closeModal();
+    }
+  });
+
+  // BUG FIX 2: Add click outside handler for modal
+  document.getElementById('modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeModal();
+    }
+  });
+
+  // BUG FIX 2 & 3: Add event delegation for dynamically rendered buttons
+  // Using event delegation on the content div for masters and services
+  document.getElementById('content').addEventListener('click', function(e) {
+    // Handle toggle buttons (switch) - use closest to handle clicks on the ::after pseudo-element
+    var switchEl = e.target.closest('.switch');
+    if (switchEl) {
+      var parent = switchEl.closest('.list-item') || switchEl.closest('.service-item');
+      if (parent) {
+        if (parent.closest('#barbers-list')) {
+          toggleBarber(switchEl);
+        } else if (parent.closest('#services-list')) {
+          toggleService(switchEl);
+        }
+      }
+      return;
+    }
+
+    // Handle edit buttons - use closest to handle any child elements
+    var editBtn = e.target.closest('.edit-btn');
+    if (editBtn) {
+      var parent = editBtn.closest('.list-item') || editBtn.closest('.service-item');
+      if (parent) {
+        var switchEl = parent.querySelector('.switch');
+        if (switchEl) {
+          var id = switchEl.getAttribute('data-id');
+          if (parent.closest('#barbers-list')) {
+            editBarber(id);
+          } else if (parent.closest('#services-list')) {
+            editService(id);
+          }
+        }
+      }
+      return;
+    }
+
+    // Handle delete buttons - use closest to handle any child elements
+    var deleteBtn = e.target.closest('.delete-btn');
+    if (deleteBtn) {
+      var parent = deleteBtn.closest('.list-item') || deleteBtn.closest('.service-item');
+      if (parent) {
+        var switchEl = parent.querySelector('.switch');
+        if (switchEl) {
+          var id = switchEl.getAttribute('data-id');
+          if (parent.closest('#barbers-list')) {
+            deleteBarber(id);
+          } else if (parent.closest('#services-list')) {
+            deleteService(id);
+          }
+        }
+      }
+      return;
+    }
+  });
+
   // Initialize Telegram Web App
   if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
     Telegram.WebApp.ready();
@@ -588,8 +656,8 @@ async function loadBarbers() {
         '<div class="list-item-right">' +
         '<div class="switch ' + (b.active ? 'active' : '') + '" data-id="' + b.id + '" data-active="' + b.active + '" onclick="toggleBarber(this)"></div>' +
         '<div class="action-btns">' +
-        '<button class="btn btn-sm btn-secondary" onclick="editBarber(\'' + b.id + '\')">✏️</button>' +
-        '<button class="btn btn-sm btn-danger" onclick="deleteBarber(\'' + b.id + '\')">🗑️</button>' +
+        '<button class="btn btn-sm btn-secondary edit-btn" onclick="editBarber(\'' + b.id + '\')">✏️</button>' +
+        '<button class="btn btn-sm btn-danger delete-btn" onclick="deleteBarber(\'' + b.id + '\')">🗑️</button>' +
         '</div>' +
         '</div>' +
         '</div>';
@@ -731,8 +799,8 @@ async function loadServices() {
         '</div>' +
         '</div>' +
         '<div class="service-actions">' +
-        '<button class="btn btn-sm btn-secondary" onclick="editService(\'' + s.id + '\')">✏️ Tahrirlash</button>' +
-        '<button class="btn btn-sm btn-danger" onclick="deleteService(\'' + s.id + '\')">🗑️ O\'chirish</button>' +
+        '<button class="btn btn-sm btn-secondary edit-btn" onclick="editService(\'' + s.id + '\')">✏️ Tahrirlash</button>' +
+        '<button class="btn btn-sm btn-danger delete-btn" onclick="deleteService(\'' + s.id + '\')">🗑️ O\'chirish</button>' +
         '</div>' +
         '</div>';
     });
